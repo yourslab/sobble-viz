@@ -13,34 +13,17 @@ import { GLTFScenegraphLoader } from '@luma.gl/addons';
 import { registerLoaders } from '@loaders.gl/core';
 import ReactMapGL, { Layer, StaticMap, HTMLOverlay } from 'react-map-gl';
 import { congData } from './data/cong_map.js';
-import App from './App.jsx'
-import './index.css'
+import App from './App.jsx';
+import {EV_ICON, START_ICON, END_ICON} from './Icons.jsx';
+import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-const EV_ICON = {
-  marker: {
-    x: 0, y: 128, anchorY: 128, width: 128, height: 128, mask: true,
-  },
-};
-
-const START_ICON = {
-  marker: {
-    x: 0, y: 0, width: 128, height: 128, mask: true,
-  },
-};
-
-const END_ICON = {
-  marker: {
-    x: 128, y: 0, width: 128, height: 128, mask: true,
-  },
-};
 
 // ScenegraphLayer will automatically pick the right
 // loader for the file type from the registered loaders.
-registerLoaders([GLTFScenegraphLoader]);
+//registerLoaders([GLTFScenegraphLoader]);
 
 // Change this to your model
-const GLTF_URL = 'https://raw.githubusercontent.com/yourslab/sobble-assets/master/car/scene.gltf';
+//const GLTF_URL = 'https://raw.githubusercontent.com/yourslab/sobble-assets/master/car/scene.gltf';
 
 // Change this to your access token
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZ2Vvcmdpb3MtdWJlciIsImEiOiJjanZidTZzczAwajMxNGVwOGZrd2E5NG90In0.gdsRu_UeU_uPi9IulBruXA';
@@ -83,7 +66,7 @@ class DeckWithMaps extends Component {
     super(props);
     this.state = {
       time: 0,
-      poi: congData.basicIcons.map((poi) => ({ ...poi, color: [0, 0, 0] })),
+      poi: congData.basicIcons.map((poi) => ({ ...poi, type: EV_ICON, color: [0, 0, 0] })),
       routes: congData.routes,
       geojson: {
         type: 'FeatureCollection',
@@ -129,7 +112,14 @@ class DeckWithMaps extends Component {
     );
   }
 
-  makePreferred(info) {
+  _plantPin = (lat, long, icon) => {
+    this.setState((prevState) => ({
+      poi: [...prevState.poi, {coordinates: [long, lat], type: icon, color: [0, 0, 0] }]
+    }));
+    console.log(this.state.poi);
+  }
+
+  makePreferred = (info) => {
     const idx = info.index;
     this.setState({
       poi: update(this.state.poi, { [idx]: { color: { $set: [255, 0, 0] } } }),
@@ -158,9 +148,7 @@ class DeckWithMaps extends Component {
       // getIcon: return a string,
       alphaCutoff: 0,
       autoHighlight: true,
-      iconAtlas: './assets/icon-atlas.png',
-      iconMapping: EV_ICON,
-      getIcon: (d) => 'marker',
+      getIcon: (d) => d.type.marker,
       sizeScale: 15,
       getPosition: (d) => d.coordinates,
       getSize: (d) => 5,
@@ -184,12 +172,12 @@ class DeckWithMaps extends Component {
       widthMinPixels: 5,
       rounded: true,
       trailLength: 200,
-      currentTime: this.time,
+      currentTime: 0,
     });
 
 
     // This layer renders the glTF objects
-    const scenegraphLayer = new ScenegraphLayer({
+    /*const scenegraphLayer = new ScenegraphLayer({
       id: 'scene',
       scenegraph: GLTF_URL,
       data: geojson.features,
@@ -198,7 +186,7 @@ class DeckWithMaps extends Component {
       getOrientation: [0, 0, 0],
       getTranslation: [0, 0, 0],
       getScale: [1, 1, 1],
-    });
+    });*/
 
     return (
       <div>
@@ -214,7 +202,7 @@ class DeckWithMaps extends Component {
           { this._renderTooltip() }
         </ReactMapGL>
       </DeckGL>
-      <App/>
+      <App setPin={this._plantPin} />
       </div>
     );
   }
