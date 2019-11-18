@@ -15,7 +15,8 @@
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "react-map-gl": "5.1.1",
-    "react-scripts": "3.2.0"
+    "react-scripts": "3.2.0",
+    "react-addons-update": "15.6.2"
   },
   "scripts": {
     "start": "react-scripts start",

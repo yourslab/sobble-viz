@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import DeckGL from '@deck.gl/react';
+import update from 'react-addons-update'; 
 import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { TripsLayer } from '@deck.gl/geo-layers';
 import { IconLayer } from '@deck.gl/layers';
@@ -76,7 +77,8 @@ class DeckWithMaps extends Component {
     super(props);
     this.state = {
       time: 0,
-      data: congData,
+      poi: congData.basicIcons.map((poi) => ({ ...poi, color: [0, 0, 0] })),
+      routes: congData.routes,
       geojson: {
         type: 'FeatureCollection',
         features: [
@@ -119,8 +121,17 @@ class DeckWithMaps extends Component {
     );
   }
 
+  makePreferred(info) {
+    const idx = info.index;
+    this.setState({
+      poi: update(this.state.poi, { [idx]: { color: { $set: [255, 0, 0] } } }),
+    });
+  }
+
   render() {
-    const { geojson, data, time } = this.state;
+    const {
+      geojson, poi, routes, time,
+    } = this.state;
     // This layer provides the editable functionality
     const editableLayer = new EditableGeoJsonLayer({
       id: 'geojson',
@@ -133,7 +144,7 @@ class DeckWithMaps extends Component {
 
     const basicIconLayer = new IconLayer({
       id: 'icon-layer',
-      data: data.basicIcons,
+      data: poi,
       pickable: true,
       // iconAtlas and iconMapping are required
       // getIcon: return a string
@@ -143,22 +154,18 @@ class DeckWithMaps extends Component {
       sizeScale: 15,
       getPosition: (d) => d.coordinates,
       getSize: (d) => 5,
-      getColor: (d) => [Math.sqrt(d.exits), 140, 0],
+      getColor: (d) => d.color,
       onHover: (info) => this.setState({
         hoveredObject: info.object,
         pointerX: info.x,
         pointerY: info.y,
       }),
-      onClick: (info) => this.setState({
-        hoveredObject: info.object,
-        pointerX: info.x,
-        pointerY: info.y,
-      }),
+      onClick: (info) => this.makePreferred(info),
     });
 
     const tripsLayer = new TripsLayer({
       id: 'trips-layer',
-      data: data.routes,
+      data: routes,
       getPath: (d) => d.waypoints.map((p) => p.coordinates),
       // deduct start timestamp from each data point to avoid overflow
       getTimestamps: (d) => d.waypoints.map((p) => p.timestamp - 1554772579000),
