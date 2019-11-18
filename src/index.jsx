@@ -5,17 +5,33 @@ import update from 'react-addons-update';
 import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { TripsLayer } from '@deck.gl/geo-layers';
 import { IconLayer } from '@deck.gl/layers';
+import {
+  Popover
+} from 'react-bootstrap';
 import { EditableGeoJsonLayer } from '@nebula.gl/layers';
 import { GLTFScenegraphLoader } from '@luma.gl/addons';
 import { registerLoaders } from '@loaders.gl/core';
 import ReactMapGL, { Layer, StaticMap, HTMLOverlay } from 'react-map-gl';
-import { congData } from './data/cong.js';
+import { congData } from './data/cong_map.js';
 import App from './App.jsx'
+import './index.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const ICON_MAPPING = {
+const EV_ICON = {
+  marker: {
+    x: 0, y: 128, anchorY: 128, width: 128, height: 128, mask: true,
+  },
+};
+
+const START_ICON = {
   marker: {
     x: 0, y: 0, width: 128, height: 128, mask: true,
+  },
+};
+
+const END_ICON = {
+  marker: {
+    x: 128, y: 0, width: 128, height: 128, mask: true,
   },
 };
 
@@ -30,8 +46,8 @@ const GLTF_URL = 'https://raw.githubusercontent.com/yourslab/sobble-assets/maste
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZ2Vvcmdpb3MtdWJlciIsImEiOiJjanZidTZzczAwajMxNGVwOGZrd2E5NG90In0.gdsRu_UeU_uPi9IulBruXA';
 
 const initialViewState = {
-  latitude: 37.7750068,
-  longitude: -122.41318080000002,
+  latitude: 34.07306,
+  longitude: -118.2192,
   zoom: 14,
   pitch: 60,
 };
@@ -42,7 +58,7 @@ const buildingLayer = {
   'source-layer': 'building',
   filter: ['==', 'extrude', 'true'],
   type: 'fill-extrusion',
-  minzoom: 10,
+  minzoom: 1,
   paint: {
     'fill-extrusion-color': '#aaa',
 
@@ -85,29 +101,31 @@ class DeckWithMaps extends Component {
     };
   }
 
+  _handleContextMenu = (event) => {
+    event.preventDefault();
+  };
+
   componentDidMount() {
+    document.addEventListener('contextmenu', this._handleContextMenu);
     this.interval = setInterval(() => {
       this.setState((prevState) => ({ time: prevState.time + 1 }));
     }, 100);
   }
 
   componentWillUnmount() {
+    document.removeEventListener('contextmenu', this._handleContextMenu);
     clearInterval(this.interval);
   }
 
   _renderTooltip() {
     const { hoveredObject, pointerX, pointerY } = this.state || {};
     return hoveredObject && (
-      <div style={{
-        position: 'absolute',
-        zIndex: 1,
-        pointerEvents: 'none',
-        left: pointerX,
-        top: pointerY,
-      }}
-      >
-        { pointerX }
-      </div>
+      <Popover id="poi-popover" placement="right" style={{left: pointerX,top: pointerY}}>
+        <Popover.Title as="h3">{pointerX}</Popover.Title>
+        <Popover.Content>
+          <strong>Holy guacamole!</strong> {pointerY}
+        </Popover.Content>
+      </Popover>
     );
   }
 
@@ -137,9 +155,11 @@ class DeckWithMaps extends Component {
       data: poi,
       pickable: true,
       // iconAtlas and iconMapping are required
-      // getIcon: return a string
+      // getIcon: return a string,
+      alphaCutoff: 0,
+      autoHighlight: true,
       iconAtlas: './assets/icon-atlas.png',
-      iconMapping: ICON_MAPPING,
+      iconMapping: EV_ICON,
       getIcon: (d) => 'marker',
       sizeScale: 15,
       getPosition: (d) => d.coordinates,
@@ -190,6 +210,7 @@ class DeckWithMaps extends Component {
       >
           <App/>
         <ReactMapGL mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}>
+          <Layer {...buildingLayer} />
           { this._renderTooltip() }
         </ReactMapGL>
       </DeckGL>
@@ -200,4 +221,4 @@ class DeckWithMaps extends Component {
 }
 
 export default DeckWithMaps;
-ReactDOM.render(<DeckWithMaps />, document.getElementById('root'));
+ReactDOM.render(<DeckWithMaps onContextMenu={(e)=> e.preventDefault()}/>, document.getElementById('root'));

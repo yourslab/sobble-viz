@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+#poi-popover {
+	pointer-events: none;
+	position:absolute;
+	z-index: 1;
+}

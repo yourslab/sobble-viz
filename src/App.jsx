@@ -3,7 +3,7 @@ import {
   Button, InputGroup, Form, Row, FormControl, Tabs, Tab
 } from 'react-bootstrap';
 import update from 'react-addons-update';
-import logo from './assets/r3.png';
+import logo from './assets/r3_nice.png';
 import './App.css';
 
 class App extends Component {
