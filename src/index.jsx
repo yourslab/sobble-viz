@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import DeckGL from '@deck.gl/react';
-import update from 'react-addons-update'; 
+import update from 'react-addons-update';
 import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { TripsLayer } from '@deck.gl/geo-layers';
 import { IconLayer } from '@deck.gl/layers';
 import { EditableGeoJsonLayer } from '@nebula.gl/layers';
 import { GLTFScenegraphLoader } from '@luma.gl/addons';
 import { registerLoaders } from '@loaders.gl/core';
-import ReactMapGL, { Layer, StaticMap } from 'react-map-gl';
+import ReactMapGL, { Layer, StaticMap, HTMLOverlay } from 'react-map-gl';
 import { congData } from './data/cong.js';
+import App from './App.jsx'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ICON_MAPPING = {
   marker: {
@@ -59,18 +61,6 @@ const buildingLayer = {
     'fill-extrusion-opacity': 0.6,
   },
 };
-
-function setTooltip(object, x, y) {
-  const el = document.getElementById('tooltip');
-  if (object) {
-    el.innerHTML = object.message;
-    el.style.display = 'block';
-    el.style.left = `${x}px`;
-    el.style.top = `${y}px`;
-  } else {
-    el.style.display = 'none';
-  }
-}
 
 class DeckWithMaps extends Component {
   constructor(props) {
@@ -191,17 +181,20 @@ class DeckWithMaps extends Component {
     });
 
     return (
+      <div>
       <DeckGL
         initialViewState={initialViewState}
         controller
         layers={[tripsLayer, basicIconLayer]}
         getCursor={() => 'cell'}
       >
+          <App/>
         <ReactMapGL mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}>
-          <Layer {...buildingLayer} />
           { this._renderTooltip() }
         </ReactMapGL>
       </DeckGL>
+      <App/>
+      </div>
     );
   }
 }
