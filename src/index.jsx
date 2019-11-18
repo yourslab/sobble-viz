@@ -65,6 +65,7 @@ class DeckWithMaps extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      viewState: initialViewState,
       time: 0,
       poi: congData.basicIcons.map((poi) => ({ ...poi, type: EV_ICON, color: [0, 0, 0] })),
       routes: congData.routes,
@@ -84,20 +85,35 @@ class DeckWithMaps extends Component {
     };
   }
 
+  _onViewStateChange = ({viewState}) => {
+    this.setState({viewState});
+  };
+
+  _panToLatLong = (lat, long) => {
+    this.setState({
+      viewState: {
+        ...this.state.viewState,
+        longitude: long,
+        latitude: lat,
+        bearing: 0
+      }
+    });
+  }
+
   _handleContextMenu = (event) => {
     event.preventDefault();
   };
 
   componentDidMount() {
     document.addEventListener('contextmenu', this._handleContextMenu);
-    this.interval = setInterval(() => {
+    /*this.interval = setInterval(() => {
       this.setState((prevState) => ({ time: prevState.time + 1 }));
-    }, 100);
+    }, 100);*/
   }
 
   componentWillUnmount() {
     document.removeEventListener('contextmenu', this._handleContextMenu);
-    clearInterval(this.interval);
+    //clearInterval(this.interval);
   }
 
   _renderTooltip() {
@@ -114,9 +130,11 @@ class DeckWithMaps extends Component {
 
   _plantPin = (lat, long, icon) => {
     this.setState((prevState) => ({
-      poi: [...prevState.poi, {coordinates: [long, lat], type: icon, color: [0, 0, 0] }]
+      poi: [...prevState.poi, {coordinates: [long, lat], type: icon, color: [234, 67, 53] }]
     }));
-    console.log(this.state.poi);
+    if(icon == START_ICON) {
+      this._panToLatLong(lat, long);
+    }
   }
 
   makePreferred = (info) => {
@@ -128,7 +146,7 @@ class DeckWithMaps extends Component {
 
   render() {
     const {
-      geojson, poi, routes, time,
+      geojson, poi, routes, time, viewState
     } = this.state;
     // This layer provides the editable functionality
     const editableLayer = new EditableGeoJsonLayer({
@@ -172,7 +190,7 @@ class DeckWithMaps extends Component {
       widthMinPixels: 5,
       rounded: true,
       trailLength: 200,
-      currentTime: 0,
+      currentTime: 10,
     });
 
 
@@ -191,7 +209,8 @@ class DeckWithMaps extends Component {
     return (
       <div>
       <DeckGL
-        initialViewState={initialViewState}
+        viewState={viewState}
+        onViewStateChange={this._onViewStateChange}
         controller
         layers={[tripsLayer, basicIconLayer]}
         getCursor={() => 'cell'}
