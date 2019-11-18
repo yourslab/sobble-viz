@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import DeckGL from '@deck.gl/react';
 import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { TripsLayer } from '@deck.gl/geo-layers';
+import { IconLayer } from '@deck.gl/layers';
 import { EditableGeoJsonLayer } from '@nebula.gl/layers';
 import { GLTFScenegraphLoader } from '@luma.gl/addons';
 import { registerLoaders } from '@loaders.gl/core';
 import ReactMapGL, { Layer, StaticMap } from 'react-map-gl';
-import { myPath } from './data/waypoints.js';
+import { congData } from './data/cong.js';
+
+const ICON_MAPPING = {
+  marker: {
+    x: 0, y: 0, width: 128, height: 128, mask: true,
+  },
+};
 
 // ScenegraphLayer will automatically pick the right
 // loader for the file type from the registered loaders.
@@ -52,12 +59,24 @@ const buildingLayer = {
   },
 };
 
-class App extends React.Component {
+function setTooltip(object, x, y) {
+  const el = document.getElementById('tooltip');
+  if (object) {
+    el.innerHTML = object.message;
+    el.style.display = 'block';
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+class DeckWithMaps extends Component {
   constructor(props) {
     super(props);
     this.state = {
       time: 0,
-      data: myPath,
+      data: congData,
       geojson: {
         type: 'FeatureCollection',
         features: [
@@ -84,6 +103,22 @@ class App extends React.Component {
     clearInterval(this.interval);
   }
 
+  _renderTooltip() {
+    const { hoveredObject, pointerX, pointerY } = this.state || {};
+    return hoveredObject && (
+      <div style={{
+        position: 'absolute',
+        zIndex: 1,
+        pointerEvents: 'none',
+        left: pointerX,
+        top: pointerY,
+      }}
+      >
+        { pointerX }
+      </div>
+    );
+  }
+
   render() {
     const { geojson, data, time } = this.state;
     // This layer provides the editable functionality
@@ -96,9 +131,34 @@ class App extends React.Component {
       },
     });
 
+    const basicIconLayer = new IconLayer({
+      id: 'icon-layer',
+      data: data.basicIcons,
+      pickable: true,
+      // iconAtlas and iconMapping are required
+      // getIcon: return a string
+      iconAtlas: './assets/icon-atlas.png',
+      iconMapping: ICON_MAPPING,
+      getIcon: (d) => 'marker',
+      sizeScale: 15,
+      getPosition: (d) => d.coordinates,
+      getSize: (d) => 5,
+      getColor: (d) => [Math.sqrt(d.exits), 140, 0],
+      onHover: (info) => this.setState({
+        hoveredObject: info.object,
+        pointerX: info.x,
+        pointerY: info.y,
+      }),
+      onClick: (info) => this.setState({
+        hoveredObject: info.object,
+        pointerX: info.x,
+        pointerY: info.y,
+      }),
+    });
+
     const tripsLayer = new TripsLayer({
       id: 'trips-layer',
-      data: data.data,
+      data: data.routes,
       getPath: (d) => d.waypoints.map((p) => p.coordinates),
       // deduct start timestamp from each data point to avoid overflow
       getTimestamps: (d) => d.waypoints.map((p) => p.timestamp - 1554772579000),
@@ -106,8 +166,8 @@ class App extends React.Component {
       opacity: 0.8,
       widthMinPixels: 5,
       rounded: true,
-      trailLength: 100,
-      currentTime: 0,
+      trailLength: 200,
+      currentTime: this.time,
     });
 
 
@@ -127,16 +187,17 @@ class App extends React.Component {
       <DeckGL
         initialViewState={initialViewState}
         controller
-        layers={[editableLayer, scenegraphLayer, tripsLayer]}
+        layers={[tripsLayer, basicIconLayer]}
         getCursor={() => 'cell'}
       >
-        <ReactMapGL mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN} mapStyle="mapbox://styles/mapbox/dark-v9">
+        <ReactMapGL mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}>
           <Layer {...buildingLayer} />
+          { this._renderTooltip() }
         </ReactMapGL>
       </DeckGL>
     );
   }
 }
 
-export default App;
-ReactDOM.render(<App />, document.getElementById('root'));
+export default DeckWithMaps;
+ReactDOM.render(<DeckWithMaps />, document.getElementById('root'));
