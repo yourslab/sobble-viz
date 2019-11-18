@@ -12,7 +12,7 @@ import { EditableGeoJsonLayer } from '@nebula.gl/layers';
 import { GLTFScenegraphLoader } from '@luma.gl/addons';
 import { registerLoaders } from '@loaders.gl/core';
 import ReactMapGL, { Layer, StaticMap, HTMLOverlay } from 'react-map-gl';
-import { congData } from './data/cong_map.js';
+import { congData1, congData2, congData3 } from './data/cong_map.js';
 import App from './App.jsx';
 import {EV_ICON, START_ICON, END_ICON} from './Icons.jsx';
 import './index.css';
@@ -33,6 +33,7 @@ const initialViewState = {
   longitude: -118.2192,
   zoom: 14,
   pitch: 60,
+  bearing: 270
 };
 
 const buildingLayer = {
@@ -67,8 +68,10 @@ class DeckWithMaps extends Component {
     this.state = {
       viewState: initialViewState,
       time: 0,
-      poi: congData.basicIcons.map((poi) => ({ ...poi, type: EV_ICON, color: [0, 0, 0] })),
-      routes: congData.routes,
+      poi: congData1.basicIcons.map((poi) => ({ ...poi, type: EV_ICON, color: [0, 0, 0] })),
+      originIdx: null,
+      destIdx: null,
+      routes: congData1.routes,
       geojson: {
         type: 'FeatureCollection',
         features: [
@@ -105,6 +108,8 @@ class DeckWithMaps extends Component {
   };
 
   componentDidMount() {
+    this.plantPin(this.state.routes[0].waypoints[0].coordinates[1], this.state.routes[0].waypoints[0].coordinates[0], START_ICON);
+    this.plantPin(this.state.routes[0].waypoints[this.state.routes[0].waypoints.length - 1].coordinates[1], this.state.routes[0].waypoints[this.state.routes[0].waypoints.length - 1].coordinates[0], END_ICON);
     document.addEventListener('contextmenu', this._handleContextMenu);
     /*this.interval = setInterval(() => {
       this.setState((prevState) => ({ time: prevState.time + 1 }));
@@ -116,21 +121,55 @@ class DeckWithMaps extends Component {
     //clearInterval(this.interval);
   }
 
+  waitingTime(lat) {
+    if(lat === 39.52734) {
+      return 'Rest for 30 minutes';
+    } else if(lat === 41.54872) {
+      return 'Rest for 10 hours';
+    } else {
+      return 'Rest for 10 hours';
+    }
+  }
+
   _renderTooltip() {
     const { hoveredObject, pointerX, pointerY } = this.state || {};
     return hoveredObject && (
       <Popover id="poi-popover" placement="right" style={{left: pointerX,top: pointerY}}>
-        <Popover.Title as="h3">{pointerX}</Popover.Title>
+        <Popover.Title as="h3">Charging Station</Popover.Title>
         <Popover.Content>
-          <strong>Holy guacamole!</strong> {pointerY}
+          Lat: <i>{hoveredObject.coordinates[1]}</i>, Long: <i>{hoveredObject.coordinates[0]}</i><br />
+          {this.waitingTime(hoveredObject.coordinates[1])}
         </Popover.Content>
       </Popover>
     );
   }
 
-  _plantPin = (lat, long, icon) => {
+  _unplantPin = (icon) => {
+    /*if(icon == START_ICON && this.state.originIdx) {
+      this.setState((prevState) => ({
+        poi: prevState.poi.filter((value, index, arr) => index != prevState.originIdx),
+        originIdx: null
+      }));
+    } else if(icon == END_ICON && this.state.destIdx) {
+      this.setState((prevState) => ({
+        poi: prevState.poi.filter((value, index, arr) => index != prevState.destIdx),
+        destIdx: null
+      }));
+    }*/
+  }
+
+  plantPin = (lat, long, icon) => {
+    let color = [0, 0, 0];
+    if(icon == START_ICON || icon == END_ICON) color = [234, 67, 53];
+    let param = '';
+    if(icon == START_ICON) {
+      param = 'originIdx';
+    } else if(icon == END_ICON) {
+      param = 'destIdx';
+    }
     this.setState((prevState) => ({
-      poi: [...prevState.poi, {coordinates: [long, lat], type: icon, color: [234, 67, 53] }]
+      [param]: prevState.poi.length,
+      poi: [...prevState.poi, {coordinates: [long, lat], type: icon, color: color }]
     }));
     if(icon == START_ICON) {
       this._panToLatLong(lat, long);
@@ -185,7 +224,7 @@ class DeckWithMaps extends Component {
       getPath: (d) => d.waypoints.map((p) => p.coordinates),
       // deduct start timestamp from each data point to avoid overflow
       getTimestamps: (d) => d.waypoints.map((p) => p.timestamp - 1554772579000),
-      getColor: [253, 128, 93],
+      getColor: [22, 32, 230],
       opacity: 0.8,
       widthMinPixels: 5,
       rounded: true,
@@ -221,7 +260,7 @@ class DeckWithMaps extends Component {
           { this._renderTooltip() }
         </ReactMapGL>
       </DeckGL>
-      <App setPin={this._plantPin} />
+      <App setPin={this.plantPin} unsetPin={this._unplantPin} />
       </div>
     );
   }

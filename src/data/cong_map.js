@@ -1,3 +1,10 @@
-const newRoutes = { routes: [{ waypoints: require('./route_shape.json').map((coord) => ({ coordinates: [coord[1], coord[0]], timestamp: 0 })) }] };
-const newIcons = { basicIcons: require('./rest_loc.json').map((coord) => ({ coordinates: [coord[1], coord[0]] })) };
-export const congData = { ...newRoutes, ...newIcons };
+const newRoutes1 = { routes: [{ waypoints: require('./route_shape.json').map((coord) => ({ coordinates: [coord[1], coord[0]], timestamp: 0 })) }] };
+const newIcons1 = { basicIcons: require('./rest_loc.json').map((coord) => ({ coordinates: [coord[1], coord[0]] })) };
+const congData1 = { ...newRoutes1, ...newIcons1 };
+const newRoutes2 = { routes: [{ waypoints: require('./route_shape_2.json').map((coord) => ({ coordinates: [coord[1], coord[0]], timestamp: 0 })) }] };
+const newIcons2 = { basicIcons: require('./rest_loc_2.json').map((coord) => ({ coordinates: [coord[1], coord[0]] })) };
+const congData2 = { ...newRoutes1, ...newIcons1 };
+const newRoutes3 = { routes: [{ waypoints: require('./route_shape_3.json').map((coord) => ({ coordinates: [coord[1], coord[0]], timestamp: 0 })) }] };
+const newIcons3 = { basicIcons: require('./rest_loc_3.json').map((coord) => ({ coordinates: [coord[1], coord[0]] })) };
+const congData3 = { ...newRoutes1, ...newIcons1 };
+export { congData1, congData2, congData3 };

@@ -17,7 +17,14 @@ class App extends Component {
       loggedIn: false,
       firstName: '',
       lastName: '',
+      battCharge: '',
+      truckWeight: '',
+      truckHeight: '',
+      battCap: '',
       origins: [],
+      originIdx: null,
+      destinations: [],
+      destIdx: null,
       isLoading: false
     };
   }
@@ -27,6 +34,13 @@ class App extends Component {
   handleLogin = (e) => {
     e.preventDefault();
     this.setState((prevState) => ({ loggedIn: !prevState.loggedIn}));
+  }
+
+  handleRoute = (e) => {
+    e.preventDefault();
+    if(this.state.battCharge == "40") {
+      // Use map 2
+    }
   }
 
   _handleSearch = (query, param) => {
@@ -54,21 +68,23 @@ class App extends Component {
 
   _handleSelect = (selection, icon) => {
     // Get lat-long from HERE API
-    const endpoint = 'https://geocoder.api.here.com/6.2/geocode.json?app_id=yYmThWqWR9AHibbANJef&app_code=NRSvJeiKL5h90LqJQ8Ugww&locationID='+selection[0].locationId
-    axios.get(endpoint)
-      .then((response) => {
-        const coords = response.data.Response.View[0].Result[0].Location.DisplayPosition;
-        if (coords) {
-          const lat = coords.Latitude;
-          const long = coords.Longitude;
-          console.log(lat, long);
-          // Set pin from parent method
-          this.props.setPin(lat, long, icon);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+    if(selection && selection[0] && selection[0].hasOwnProperty('locationId')) {
+      this.props.unsetPin(icon);
+      const endpoint = 'https://geocoder.api.here.com/6.2/geocode.json?app_id=yYmThWqWR9AHibbANJef&app_code=NRSvJeiKL5h90LqJQ8Ugww&locationID='+selection[0].locationId
+      axios.get(endpoint)
+        .then((response) => {
+          const coords = response.data.Response.View[0].Result[0].Location.DisplayPosition;
+          if (coords) {
+            const lat = coords.Latitude;
+            const long = coords.Longitude;
+            // Set pin from parent method
+            this.props.setPin(lat, long, icon);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    }
   }
 
   render() {
@@ -92,11 +108,12 @@ class App extends Component {
         </Form>
         <div className="App-route" style={{ display: !this.state.loggedIn ? 'none' : 'block' }}>
         <Form.Label style={{fontWeight: 'bold'}}>Hi {this.state.firstName}{this.state.lastName ? ' ' + this.state.lastName : this.state.lastName}! Plan your route.</Form.Label>
-                  <Tabs id="controlled-tab-example">
+      <Form onSubmit={this.handleRoute}>
+      <Tabs id="controlled-tab-example">
       <Tab eventKey="home" title="Cargo" style={{paddingTop: 20, width: '19em'}}>
         <Form.Group controlId="formBasicWeight">
         <InputGroup className="mb-3">
-          <Form.Control type="weight" placeholder="Weight" />
+          <Form.Control type="weight" placeholder="Truck Weight" name="truckWeight" value={this.state.truckWeight} onChange={this.onChange} />
           <InputGroup.Append>
       <InputGroup.Text>kg</InputGroup.Text>
     </InputGroup.Append>
@@ -104,17 +121,25 @@ class App extends Component {
         </Form.Group>
         <Form.Group controlId="formBasicHeight">
         <InputGroup className="mb-3">
-          <Form.Control type="height" placeholder="Height" />
+          <Form.Control type="height" placeholder="Truck Height" name="truckHeight" value={this.state.truckHeight} onChange={this.onChange} />
           <InputGroup.Append>
-      <InputGroup.Text>cm</InputGroup.Text>
+      <InputGroup.Text>m</InputGroup.Text>
     </InputGroup.Append>
     </InputGroup>
         </Form.Group>
         <Form.Group controlId="formBasicHeight">
           <InputGroup className="mb-3">
-          <Form.Control type="charge" placeholder="Charge" />
+          <Form.Control type="charge" placeholder="Battery Charge" name="battCharge" value={this.state.battCharge} onChange={this.onChange} />
           <InputGroup.Append>
-      <InputGroup.Text> %</InputGroup.Text>
+      <InputGroup.Text>%</InputGroup.Text>
+    </InputGroup.Append>
+    </InputGroup>
+        </Form.Group>
+        <Form.Group controlId="formBasicHeight">
+          <InputGroup className="mb-3">
+          <Form.Control type="charge" placeholder="Battery Capacity" name="battCap" value={this.state.battCap} onChange={this.onChange} />
+          <InputGroup.Append>
+      <InputGroup.Text>kWh</InputGroup.Text>
     </InputGroup.Append>
     </InputGroup>
         </Form.Group>
@@ -124,30 +149,31 @@ class App extends Component {
   <label htmlFor="break-time">Time since last break (30 mins)</label>
   <InputGroup className="mb-3" size="sm">
   <InputGroup.Prepend>
-      <InputGroup.Text>Hour</InputGroup.Text>
+      <InputGroup.Text name="breakTimeHour" value={this.state.breakTimeHour} onChange={this.onChange}>Hour</InputGroup.Text>
     </InputGroup.Prepend>
     <FormControl aria-label="hour" />
     <InputGroup.Prepend>
-      <InputGroup.Text>Minute</InputGroup.Text>
+      <InputGroup.Text name="breakTimeMin" value={this.state.breakTimeMin} onChange={this.onChange}>Minute</InputGroup.Text>
     </InputGroup.Prepend>
-    <FormControl id="break-time" aria-label="Time since last break" />
+    <FormControl id="break-time" aria-label="Time since last break" name="breakTime" value={this.state.breakTime} onChange={this.onChange} />
   </InputGroup>
   </Form.Group>
   <Form.Group>
   <label htmlFor="rest-time">Time since last rest (10 hrs)</label>
   <InputGroup className="mb-3" size="sm">
   <InputGroup.Prepend>
-      <InputGroup.Text>Hour</InputGroup.Text>
+      <InputGroup.Text name="restTimeHour" value={this.state.restTimeHour} onChange={this.onChange}>Hour</InputGroup.Text>
     </InputGroup.Prepend>
     <FormControl aria-label="hour" />
     <InputGroup.Prepend>
-      <InputGroup.Text>Minute</InputGroup.Text>
+      <InputGroup.Text name="restTimeMin" value={this.state.restTimeMin} onChange={this.onChange}>Minute</InputGroup.Text>
     </InputGroup.Prepend>
     <FormControl id="rest-time" aria-label="Time since last rest" />
   </InputGroup>
   </Form.Group>
       </Tab>
     </Tabs>
+
           <Form.Group controlId="formBasicOrigin">
             <AsyncTypeahead
               allowNew={false}
@@ -183,6 +209,7 @@ class App extends Component {
           <Button variant="primary" type="submit">
     Route
           </Button>
+          </Form>
         </div>
       </div>
     );
