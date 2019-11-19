@@ -68,10 +68,10 @@ class DeckWithMaps extends Component {
     this.state = {
       viewState: initialViewState,
       time: 0,
-      poi: congData1.basicIcons.map((poi) => ({ ...poi, type: EV_ICON, color: [0, 0, 0] })),
+      poi: [],
       originIdx: null,
       destIdx: null,
-      routes: congData1.routes,
+      routes: [],
       geojson: {
         type: 'FeatureCollection',
         features: [
@@ -103,13 +103,32 @@ class DeckWithMaps extends Component {
     });
   }
 
+  _showPath = (id) => {
+    let beastData = null;
+    if(id == 1) {
+      beastData = congData1;
+    } else if(id == 2) {
+      beastData = congData2;
+    } else if(id == 3) {
+      beastData = congData3;
+    }
+    if(beastData) {
+      this.setState({
+        poi: beastData.basicIcons.map((poi) => ({ ...poi, type: EV_ICON, color: [0, 0, 0] })),
+        routes: beastData.routes
+      });
+      this.plantPin(beastData.routes[0].waypoints[0].coordinates[1], beastData.routes[0].waypoints[0].coordinates[0], START_ICON);
+      this.plantPin(beastData.routes[0].waypoints[beastData.routes[0].waypoints.length - 1].coordinates[1], beastData.routes[0].waypoints[beastData.routes[0].waypoints.length - 1].coordinates[0], END_ICON);
+    }
+  }
+
   _handleContextMenu = (event) => {
     event.preventDefault();
   };
 
   componentDidMount() {
-    this.plantPin(this.state.routes[0].waypoints[0].coordinates[1], this.state.routes[0].waypoints[0].coordinates[0], START_ICON);
-    this.plantPin(this.state.routes[0].waypoints[this.state.routes[0].waypoints.length - 1].coordinates[1], this.state.routes[0].waypoints[this.state.routes[0].waypoints.length - 1].coordinates[0], END_ICON);
+    //this.plantPin(this.state.routes[0].waypoints[0].coordinates[1], this.state.routes[0].waypoints[0].coordinates[0], START_ICON);
+    //this.plantPin(this.state.routes[0].waypoints[this.state.routes[0].waypoints.length - 1].coordinates[1], this.state.routes[0].waypoints[this.state.routes[0].waypoints.length - 1].coordinates[0], END_ICON);
     document.addEventListener('contextmenu', this._handleContextMenu);
     /*this.interval = setInterval(() => {
       this.setState((prevState) => ({ time: prevState.time + 1 }));
@@ -122,9 +141,9 @@ class DeckWithMaps extends Component {
   }
 
   waitingTime(lat) {
-    if(lat === 39.52734) {
+    if(lat >= 39.52734) {
       return 'Rest for 30 minutes';
-    } else if(lat === 41.54872) {
+    } else if(lat <= 41.54872) {
       return 'Rest for 10 hours';
     } else {
       return 'Rest for 10 hours';
@@ -161,14 +180,7 @@ class DeckWithMaps extends Component {
   plantPin = (lat, long, icon) => {
     let color = [0, 0, 0];
     if(icon == START_ICON || icon == END_ICON) color = [234, 67, 53];
-    let param = '';
-    if(icon == START_ICON) {
-      param = 'originIdx';
-    } else if(icon == END_ICON) {
-      param = 'destIdx';
-    }
     this.setState((prevState) => ({
-      [param]: prevState.poi.length,
       poi: [...prevState.poi, {coordinates: [long, lat], type: icon, color: color }]
     }));
     if(icon == START_ICON) {
@@ -260,7 +272,7 @@ class DeckWithMaps extends Component {
           { this._renderTooltip() }
         </ReactMapGL>
       </DeckGL>
-      <App setPin={this.plantPin} unsetPin={this._unplantPin} />
+      <App setPin={this.plantPin} unsetPin={this._unplantPin} showPath={this._showPath} />
       </div>
     );
   }

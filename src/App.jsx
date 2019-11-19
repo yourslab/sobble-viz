@@ -21,6 +21,8 @@ class App extends Component {
       truckWeight: '',
       truckHeight: '',
       battCap: '',
+      originId: '',
+      destId: '',
       origins: [],
       originIdx: null,
       destinations: [],
@@ -38,8 +40,17 @@ class App extends Component {
 
   handleRoute = (e) => {
     e.preventDefault();
-    if(this.state.battCharge == "40") {
-      // Use map 2
+    if(this.state.originId == 'NT_olLrQASLCmp3yP8uy7BNBD_xUDMwA') {
+      if(this.state.destId == 'NT_kmleNqR-s.JnO0A3JdcIvA_xUDMwA') {
+        if(this.state.battCharge <= "40") {
+          // Use map 2
+          this.props.showPath(2);
+        } else {
+          this.props.showPath(1);
+        }
+      } else {
+        this.props.showPath(3);
+      }
     }
   }
 
@@ -67,24 +78,23 @@ class App extends Component {
     }
 
   _handleSelect = (selection, icon) => {
-    // Get lat-long from HERE API
     if(selection && selection[0] && selection[0].hasOwnProperty('locationId')) {
-      this.props.unsetPin(icon);
-      const endpoint = 'https://geocoder.api.here.com/6.2/geocode.json?app_id=yYmThWqWR9AHibbANJef&app_code=NRSvJeiKL5h90LqJQ8Ugww&locationID='+selection[0].locationId
-      axios.get(endpoint)
-        .then((response) => {
-          const coords = response.data.Response.View[0].Result[0].Location.DisplayPosition;
-          if (coords) {
-            const lat = coords.Latitude;
-            const long = coords.Longitude;
-            // Set pin from parent method
-            this.props.setPin(lat, long, icon);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        })
+      if(icon == START_ICON) {
+        this.setState({
+          originId: selection[0].locationId
+        });
+      } else if(icon == END_ICON) {
+        this.setState({
+          destId: selection[0].locationId
+        });
+      }
     }
+    // Get lat-long from HERE API
+    /*if(selection && selection[0] && selection[0].hasOwnProperty('locationId')) {
+      if(selection[0].locationId == 'NT_olLrQASLCmp3yP8uy7BNBD_xUDMwA')
+      NT_kmleNqR-s.JnO0A3JdcIvA_xUDMwA -> 1500 S 330
+      NT_-Kl.lVUhscT7c0CdGSdSoB_xMzM5kD -> 13399 W Utah Cir
+    }*/
   }
 
   render() {
@@ -94,7 +104,7 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
         </div>
         <Form onSubmit={this.handleLogin} className="App-login" style={{ display: this.state.loggedIn ? 'none' : 'block' }}>
-          <Form.Label style={{fontWeight: 'bold'}}>Driver Information</Form.Label>
+          <Form.Label style={{fontWeight: 'bold', fontSize: '1.5em'}}>Driver Information</Form.Label>
           <Form.Group>
             <Form.Control type="fname" placeholder="First Name" name="firstName" value={this.state.firstName} onChange={this.onChange} />
           </Form.Group>
@@ -102,15 +112,15 @@ class App extends Component {
           <Form.Group>
             <Form.Control type="lname" placeholder="Last Name" name="lastName" value={this.state.lastName} onChange={this.onChange} />
           </Form.Group>
-          <Button variant="primary" type="submit" active>
+          <Button variant="primary" type="submit" size="lg" block>
     Login
           </Button>
         </Form>
         <div className="App-route" style={{ display: !this.state.loggedIn ? 'none' : 'block' }}>
-        <Form.Label style={{fontWeight: 'bold'}}>Hi {this.state.firstName}{this.state.lastName ? ' ' + this.state.lastName : this.state.lastName}! Plan your route.</Form.Label>
+        <Form.Label style={{fontWeight: 'bold', fontSize: '1.3em'}}>Hi {this.state.firstName}{this.state.lastName ? ' ' + this.state.lastName : this.state.lastName}! Plan your route.</Form.Label>
       <Form onSubmit={this.handleRoute}>
       <Tabs id="controlled-tab-example">
-      <Tab eventKey="home" title="Cargo" style={{paddingTop: 20, width: '19em'}}>
+      <Tab eventKey="home" title="Cargo" style={{paddingTop: 20, width: '100%'}}>
         <Form.Group controlId="formBasicWeight">
         <InputGroup className="mb-3">
           <Form.Control type="weight" placeholder="Truck Weight" name="truckWeight" value={this.state.truckWeight} onChange={this.onChange} />
@@ -144,7 +154,7 @@ class App extends Component {
     </InputGroup>
         </Form.Group>
       </Tab>
-      <Tab eventKey="profile" title="Rest" style={{paddingTop: 20, width: '19em'}}>
+      <Tab eventKey="profile" title="Rest" style={{paddingTop: 20, width: '100%'}}>
   <Form.Group>
   <label htmlFor="break-time">Time since last break (30 mins)</label>
   <InputGroup className="mb-3" size="sm">
@@ -206,7 +216,7 @@ class App extends Component {
             />
           </Form.Group>
 
-          <Button variant="primary" type="submit">
+          <Button variant="primary" type="submit" size="lg" block>
     Route
           </Button>
           </Form>

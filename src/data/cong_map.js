@@ -3,8 +3,8 @@ const newIcons1 = { basicIcons: require('./rest_loc.json').map((coord) => ({ coo
 const congData1 = { ...newRoutes1, ...newIcons1 };
 const newRoutes2 = { routes: [{ waypoints: require('./route_shape_2.json').map((coord) => ({ coordinates: [coord[1], coord[0]], timestamp: 0 })) }] };
 const newIcons2 = { basicIcons: require('./rest_loc_2.json').map((coord) => ({ coordinates: [coord[1], coord[0]] })) };
-const congData2 = { ...newRoutes1, ...newIcons1 };
+const congData2 = { ...newRoutes2, ...newIcons2 };
 const newRoutes3 = { routes: [{ waypoints: require('./route_shape_3.json').map((coord) => ({ coordinates: [coord[1], coord[0]], timestamp: 0 })) }] };
 const newIcons3 = { basicIcons: require('./rest_loc_3.json').map((coord) => ({ coordinates: [coord[1], coord[0]] })) };
-const congData3 = { ...newRoutes1, ...newIcons1 };
+const congData3 = { ...newRoutes3, ...newIcons3 };
 export { congData1, congData2, congData3 };
