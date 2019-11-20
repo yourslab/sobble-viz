@@ -8,6 +8,7 @@ import { IconLayer } from '@deck.gl/layers';
 import {
   Popover
 } from 'react-bootstrap';
+import axios from 'axios';
 import { EditableGeoJsonLayer } from '@nebula.gl/layers';
 import { GLTFScenegraphLoader } from '@luma.gl/addons';
 import { registerLoaders } from '@loaders.gl/core';
@@ -103,22 +104,20 @@ class DeckWithMaps extends Component {
     });
   }
 
-  _showPath = (id) => {
-    let beastData = null;
-    if(id == 1) {
-      beastData = congData1;
-    } else if(id == 2) {
-      beastData = congData2;
-    } else if(id == 3) {
-      beastData = congData3;
-    }
-    if(beastData) {
-      this.setState({
-        poi: beastData.basicIcons.map((poi) => ({ ...poi, type: EV_ICON, color: [0, 0, 0] })),
-        routes: beastData.routes
-      });
-      this.plantPin(beastData.routes[0].waypoints[0].coordinates[1], beastData.routes[0].waypoints[0].coordinates[0], START_ICON);
-      this.plantPin(beastData.routes[0].waypoints[beastData.routes[0].waypoints.length - 1].coordinates[1], beastData.routes[0].waypoints[beastData.routes[0].waypoints.length - 1].coordinates[0], END_ICON);
+  _showPath = (startCoord, endCoord, battCharge, battCap, truckHeight, truckWeight) => {
+    if(startCoord.length && endCoord.length) {
+      //let endpoint = `https://qq2tb7ic1g.execute-api.us-west-1.amazonaws.com/Hackathon/trace-route?waypoint0=${startCoord[0]},${startCoord[1]}&waypoint1=${endCoord[0]},${endCoord[1]}&weight=${truckWeight}&height=${truckHeight}&battery_capacity=${battCap}&soc=${battCharge}`
+      let endpoint = `https://qq2tb7ic1g.execute-api.us-west-1.amazonaws.com/Hackathon/trace-route?waypoint0=${startCoord[0]},${startCoord[1]}&waypoint1=${endCoord[0]},${endCoord[1]}&weight=0&height=0&battery_capacity=800000&soc=648000`
+      axios.get(endpoint)
+      .then((response) => {
+        this.setState({
+          poi: response.stops.map((poi) => ({ coordinates: poi.slice(0, 2).map((coord) => parseFloat(coord)), restTime: poi[2], type: EV_ICON, color: [0, 0, 0] })),
+          routes: [{waypoints: response.shapes.map((coord) => parseFloat(coord.split(',')))}]
+        })
+      })
+      .catch((error) => {
+        console.log(error);
+      })
     }
   }
 

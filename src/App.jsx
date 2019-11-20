@@ -22,12 +22,13 @@ class App extends Component {
       truckHeight: '',
       battCap: '',
       originId: '',
-      destId: '',
       origins: [],
       originIdx: null,
       destinations: [],
       destIdx: null,
-      isLoading: false
+      isLoading: false,
+      startCoord: [],
+      endCoord: []
     };
   }
 
@@ -40,18 +41,7 @@ class App extends Component {
 
   handleRoute = (e) => {
     e.preventDefault();
-    if(this.state.originId == 'NT_olLrQASLCmp3yP8uy7BNBD_xUDMwA') {
-      if(this.state.destId == 'NT_kmleNqR-s.JnO0A3JdcIvA_xUDMwA') {
-        if(this.state.battCharge <= "40") {
-          // Use map 2
-          this.props.showPath(2);
-        } else {
-          this.props.showPath(1);
-        }
-      } else {
-        this.props.showPath(3);
-      }
-    }
+    this.props.showPath(this.state.startCoord, this.state.endCoord, this.state.battCharge, this.state.battCap, this.state.truckHeight, this.state.truckWeight)
   }
 
   _handleSearch = (query, param) => {
@@ -78,16 +68,30 @@ class App extends Component {
     }
 
   _handleSelect = (selection, icon) => {
+    // Get lat-long from HERE API
     if(selection && selection[0] && selection[0].hasOwnProperty('locationId')) {
-      if(icon == START_ICON) {
-        this.setState({
-          originId: selection[0].locationId
-        });
-      } else if(icon == END_ICON) {
-        this.setState({
-          destId: selection[0].locationId
-        });
-      }
+      const endpoint = 'https://geocoder.api.here.com/6.2/geocode.json?app_id=yYmThWqWR9AHibbANJef&app_code=NRSvJeiKL5h90LqJQ8Ugww&locationID='+selection[0].locationId
+      axios.get(endpoint)
+        .then((response) => {
+          const coords = response.data.Response.View[0].Result[0].Location.DisplayPosition;
+          if (coords) {
+            const lat = coords.Latitude;
+            const long = coords.Longitude;
+            // Set pin from parent method
+            if(icon == START_ICON) {
+              this.setState({
+                startCoord: [lat, long]
+              });
+            } else if(icon == END_ICON) {
+              this.setState({
+                endCoord: [lat, long]
+              });
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        })
     }
     // Get lat-long from HERE API
     /*if(selection && selection[0] && selection[0].hasOwnProperty('locationId')) {
