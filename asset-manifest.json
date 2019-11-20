@@ -1,24 +1,24 @@
 {
   "files": {
-    "main.css": "/r3/static/css/main.bf5f1ced.chunk.css",
-    "main.js": "/r3/static/js/main.2561cd20.chunk.js",
-    "main.js.map": "/r3/static/js/main.2561cd20.chunk.js.map",
-    "runtime-main.js": "/r3/static/js/runtime-main.ad82e84d.js",
-    "runtime-main.js.map": "/r3/static/js/runtime-main.ad82e84d.js.map",
-    "static/css/2.7058fc60.chunk.css": "/r3/static/css/2.7058fc60.chunk.css",
-    "static/js/2.8b76a21b.chunk.js": "/r3/static/js/2.8b76a21b.chunk.js",
-    "static/js/2.8b76a21b.chunk.js.map": "/r3/static/js/2.8b76a21b.chunk.js.map",
-    "index.html": "/r3/index.html",
-    "precache-manifest.558ff149821a4222be17e3ff91af6042.js": "/r3/precache-manifest.558ff149821a4222be17e3ff91af6042.js",
-    "service-worker.js": "/r3/service-worker.js",
-    "static/css/2.7058fc60.chunk.css.map": "/r3/static/css/2.7058fc60.chunk.css.map",
-    "static/css/main.bf5f1ced.chunk.css.map": "/r3/static/css/main.bf5f1ced.chunk.css.map",
-    "static/media/r3_nice.png": "/r3/static/media/r3_nice.2d6d7954.png"
+    "main.css": "/viz-app/static/css/main.bf5f1ced.chunk.css",
+    "main.js": "/viz-app/static/js/main.2561cd20.chunk.js",
+    "main.js.map": "/viz-app/static/js/main.2561cd20.chunk.js.map",
+    "runtime-main.js": "/viz-app/static/js/runtime-main.90dcc614.js",
+    "runtime-main.js.map": "/viz-app/static/js/runtime-main.90dcc614.js.map",
+    "static/css/2.7058fc60.chunk.css": "/viz-app/static/css/2.7058fc60.chunk.css",
+    "static/js/2.2ada188b.chunk.js": "/viz-app/static/js/2.2ada188b.chunk.js",
+    "static/js/2.2ada188b.chunk.js.map": "/viz-app/static/js/2.2ada188b.chunk.js.map",
+    "index.html": "/viz-app/index.html",
+    "precache-manifest.c41468313c408387ada7a03767d2e3cd.js": "/viz-app/precache-manifest.c41468313c408387ada7a03767d2e3cd.js",
+    "service-worker.js": "/viz-app/service-worker.js",
+    "static/css/2.7058fc60.chunk.css.map": "/viz-app/static/css/2.7058fc60.chunk.css.map",
+    "static/css/main.bf5f1ced.chunk.css.map": "/viz-app/static/css/main.bf5f1ced.chunk.css.map",
+    "static/media/r3_nice.png": "/viz-app/static/media/r3_nice.2d6d7954.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.ad82e84d.js",
+    "static/js/runtime-main.90dcc614.js",
     "static/css/2.7058fc60.chunk.css",
-    "static/js/2.8b76a21b.chunk.js",
+    "static/js/2.2ada188b.chunk.js",
     "static/css/main.bf5f1ced.chunk.css",
     "static/js/main.2561cd20.chunk.js"
   ]
