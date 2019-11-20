@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "2b3cbdf90e0fbdff9c21ee309c783d24",
+    "revision": "748aca08c94495a879684b9d51687907",
     "url": "/sobble-viz/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/sobble-viz/static/css/2.7058fc60.chunk.css"
   },
   {
-    "revision": "e8f12e20cf656bc9968c",
+    "revision": "7aa3f701e8510442172a",
     "url": "/sobble-viz/static/css/main.bf5f1ced.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/sobble-viz/static/js/2.1be57378.chunk.js"
   },
   {
-    "revision": "e8f12e20cf656bc9968c",
-    "url": "/sobble-viz/static/js/main.2561cd20.chunk.js"
+    "revision": "7aa3f701e8510442172a",
+    "url": "/sobble-viz/static/js/main.457dd35b.chunk.js"
   },
   {
     "revision": "7fcc5638149781f93ecc",
