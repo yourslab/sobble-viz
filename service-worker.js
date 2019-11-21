@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/sobble-viz/precache-manifest.b0560cece4f679156df564a970640ff0.js"
+  "/sobble-viz/precache-manifest.1d63aaa61849520ea7c8c643dc43d5c8.js"
 );
 
 self.addEventListener('message', (event) => {
