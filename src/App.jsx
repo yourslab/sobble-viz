@@ -47,7 +47,7 @@ class App extends Component {
   _handleSearch = (query, param) => {
     this.setState({isLoading: true});
     // Geocode address using HERE API
-    const endpoint = 'http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id=yYmThWqWR9AHibbANJef&app_code=NRSvJeiKL5h90LqJQ8Ugww&query='+query;
+    const endpoint = 'https://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id=yYmThWqWR9AHibbANJef&app_code=NRSvJeiKL5h90LqJQ8Ugww&query='+query;
     axios.get(endpoint)
       .then((response) => {
         this.setState({

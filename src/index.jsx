@@ -111,9 +111,25 @@ class DeckWithMaps extends Component {
       axios.get(endpoint)
       .then((response) => {
         this.setState({
-          poi: response.stops.map((poi) => ({ coordinates: poi.slice(0, 2).map((coord) => parseFloat(coord)), restTime: poi[2], type: EV_ICON, color: [0, 0, 0] })),
-          routes: [{waypoints: response.shapes.map((coord) => parseFloat(coord.split(',')))}]
-        })
+          poi: response.data.stops.map((poi, idx, arr) => {
+            let icon = null;
+            let color = null;
+            if (idx == 0) {
+              icon = START_ICON;
+              color = [234, 67, 53];
+              this._panToLatLong(parseFloat(poi[0]), parseFloat(poi[1]));
+            } else if (idx == arr.length-1) {
+              icon = END_ICON;
+              color = [234, 67, 53];
+            } else {
+              icon = EV_ICON;
+              color = [0, 0, 0];
+            }
+
+            return {coordinates: poi.slice(0, 2).reverse().map((coord) => parseFloat(coord)), restTime: poi[2], type: icon, color: color};
+          }),
+          routes: [{waypoints: response.data.shapes.map((coord) => ({timestamp: 0, coordinates: coord[0].split(',').reverse().map((x) => parseFloat(x))}))}]
+        });
       })
       .catch((error) => {
         console.log(error);
