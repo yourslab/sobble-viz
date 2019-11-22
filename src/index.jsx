@@ -110,6 +110,7 @@ class DeckWithMaps extends Component {
       let endpoint = `https://qq2tb7ic1g.execute-api.us-west-1.amazonaws.com/Hackathon/trace-route?waypoint0=${startCoord[0]},${startCoord[1]}&waypoint1=${endCoord[0]},${endCoord[1]}&weight=0&height=0&battery_capacity=800000&soc=648000`
       axios.get(endpoint)
       .then((response) => {
+        console.log(response.data);
         this.setState({
           poi: response.data.stops.map((poi, idx, arr) => {
             let icon = null;
