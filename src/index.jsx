@@ -106,6 +106,8 @@ class DeckWithMaps extends Component {
 
   _showPath = (startCoord, endCoord, battCharge, battCap, truckHeight, truckWeight) => {
     if(startCoord.length && endCoord.length) {
+      console.log({'start':startCoord});
+      console.log({'end':endCoord})
       //let endpoint = `https://qq2tb7ic1g.execute-api.us-west-1.amazonaws.com/Hackathon/trace-route?waypoint0=${startCoord[0]},${startCoord[1]}&waypoint1=${endCoord[0]},${endCoord[1]}&weight=${truckWeight}&height=${truckHeight}&battery_capacity=${battCap}&soc=${battCharge}`
       let endpoint = `https://qq2tb7ic1g.execute-api.us-west-1.amazonaws.com/Hackathon/trace-route?waypoint0=${startCoord[0]},${startCoord[1]}&waypoint1=${endCoord[0]},${endCoord[1]}&weight=0&height=0&battery_capacity=800000&soc=648000`
       axios.get(endpoint)
