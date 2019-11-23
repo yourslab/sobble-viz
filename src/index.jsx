@@ -158,13 +158,22 @@ class DeckWithMaps extends Component {
     //clearInterval(this.interval);
   }
 
-  waitingTime(lat) {
-    if(lat >= 39.52734) {
-      return 'Rest for 30 minutes';
-    } else if(lat <= 41.54872) {
-      return 'Rest for 10 hours';
-    } else {
-      return 'Rest for 10 hours';
+  waitingTime(restTime,icon) {
+    const hours = Math.floor( restTime / 3600 ),
+          minutes = Math.floor( ( restTime %= 3600 ) / 60 );
+    if (icon == EV_ICON){
+      return 'Rest for '+ hours+' hours and '+minutes+' minutes.';
+//       if(restTime < 36000 && restTime>=1800) {
+//         return 'Rest for 30 minutes';
+//       } else if(restTime >= 36000) {
+//         return 'Rest for 10 hours';
+//       } else {
+//         return 'Rest for 0 hours';
+//       }
+    } else if (icon == END_ICON){
+      return 'Trip Duration: '+ hours+' hours and '+minutes+' minutes.';
+    } else if (icon == START_ICON){
+      return 'Trip Start';
     }
   }
 
@@ -172,10 +181,10 @@ class DeckWithMaps extends Component {
     const { hoveredObject, pointerX, pointerY } = this.state || {};
     return hoveredObject && (
       <Popover id="poi-popover" placement="right" style={{left: pointerX,top: pointerY}}>
-        <Popover.Title as="h3">Charging Station</Popover.Title>
+        <Popover.Title as="h3">{hoveredObject.type.type}</Popover.Title>
         <Popover.Content>
           Lat: <i>{hoveredObject.coordinates[1]}</i>, Long: <i>{hoveredObject.coordinates[0]}</i><br />
-          {this.waitingTime(hoveredObject.coordinates[1])}
+          {this.waitingTime(hoveredObject.restTime,hoveredObject.type)}
         </Popover.Content>
       </Popover>
     );
