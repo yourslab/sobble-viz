@@ -13,7 +13,7 @@
     "@luma.gl/addons": "7.0.1",
     "@luma.gl/core": "7.0.1",
     "@nebula.gl/layers": "0.12.1",
-    "axios": "0.19.0",
+    "axios": "0.21.1",
     "bootstrap": "4.3.1",
     "gh-pages": "^2.1.1",
     "react": "16.8.6",
